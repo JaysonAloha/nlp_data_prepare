@@ -7,7 +7,7 @@ nlp_project_data_prepare/
 └── scripts/
     ├── tools/
     │   ├── eastmoney_breakfast.py  # 东方财富早报数据获取
-    │   ├── test.py                 # 网页渲染与解析工具（依赖Playwright）
+    │   ├── test.py                 # 网页渲染与解析工具（东方财富早报单个链接测试）
     │   ├── data_analyzer.py        # 股票数据技术指标分析
     │   ├── web_search.py           # 网页搜索功能（基于Playwright）
     │   ├── financial_data.py       # 股票价格历史数据获取与处理
