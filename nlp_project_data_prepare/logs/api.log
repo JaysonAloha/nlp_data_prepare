@@ -1,0 +1,21 @@
+2025-10-31 15:04:50 - api - INFO - Fetching price history from 600519 from 2024-10-31 00:00:00 to 2025-10-30 15:04:50.361162
+2025-10-31 15:04:50 - api - INFO - Start date 2024-10-31
+2025-10-31 15:04:50 - api - INFO - End date 2025-10-30
+2025-10-31 15:04:50 - api - WARNING - No price history data found for 600519
+2025-11-01 17:43:58 - api - INFO - Fetching price history from 000300 from 2025-10-01 00:00:00 to 2025-10-31 00:00:00
+2025-11-01 17:43:58 - api - INFO - Start date 2025-10-01
+2025-11-01 17:43:58 - api - INFO - End date 2025-10-31
+2025-11-01 17:43:59 - api - WARNING - No price history data found for 000300
+2025-11-01 17:44:17 - api - ERROR - Failed to fetch price history data (time data '2025' does not match format '%Y-%m-%d')
+2025-11-01 17:44:44 - api - INFO - Fetching price history from 000300 from 2025-01-01 00:00:00 to 2025-10-31 00:00:00
+2025-11-01 17:44:44 - api - INFO - Start date 2025-01-01
+2025-11-01 17:44:44 - api - INFO - End date 2025-10-31
+2025-11-01 17:44:44 - api - WARNING - No price history data found for 000300
+2025-11-01 17:46:20 - api - INFO - Fetching price history from 600519 from 2024-11-01 00:00:00 to 2025-10-31 17:46:20.495304
+2025-11-01 17:46:20 - api - INFO - Start date 2024-11-01
+2025-11-01 17:46:20 - api - INFO - End date 2025-10-31
+2025-11-01 17:46:20 - api - WARNING - No price history data found for 600519
+2025-11-01 17:47:27 - api - INFO - Fetching price history from 600519 from 2024-11-01 00:00:00 to 2025-10-31 17:47:27.955527
+2025-11-01 17:47:27 - api - INFO - Start date 2024-11-01
+2025-11-01 17:47:27 - api - INFO - End date 2025-10-31
+2025-11-01 17:47:28 - api - WARNING - No price history data found for 600519
