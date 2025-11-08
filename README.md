@@ -93,14 +93,14 @@ python -m playwright install chromium
 ## 使用示例
 1.分析股票数据
 ```
-from scripts.tools.data_analyzer import analyze_stock_data
 from datetime import datetime, timedelta
+from scripts.tools.data_analyzer import analyze_stock_data
+symbol = "600519"  # 贵州茅台
+current_date = datetime.now()
+end_date = current_date.strftime("%Y-%m-%d")  # 使用今天作为结束日期
+start_date = (current_date - timedelta(days=365)).strftime("%Y-%m-%d")
 
-
-# 分析贵州茅台（600519）近一年数据
-symbol = "600519"
-end_date = datetime.now().strftime("%Y-%m-%d")
-start_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+print(f"分析时间范围: {start_date} 至 {end_date}")
 analyze_stock_data(symbol, start_date, end_date)
 ```
 
@@ -120,12 +120,5 @@ from scripts.tools.financial_data import get_price_history
 df = get_price_history("600519")
 print(f"获取到 {len(df)} 条价格记录")
 ```
-4.. 获取东方财富早报链接
-```
-from scripts.tools.eastmoney_breakfast import get_em_url_page
 
-# 获取早报链接并保存到JSON文件
-url_dict = get_em_url_page()
-print(f"获取到 {len(url_dict)} 条早报链接")
-```
 
