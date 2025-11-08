@@ -4,17 +4,42 @@
 ## 项目结构
 ```
 nlp_project_data_prepare/
-└── scripts/
-    ├── tools/
-    │   ├── eastmoney_breakfast.py  # 东方财富早报数据获取
-    │   ├── test.py                 # 网页渲染与解析工具（东方财富早报单个链接测试）
-    │   ├── data_analyzer.py        # 股票数据技术指标分析
-    │   ├── web_search.py           # 网页搜索功能（基于Playwright）
-    │   ├── financial_data.py       # 股票价格历史数据获取与处理
-    │   ├── news_crawler.py         # 股票相关新闻爬取
-    │   └── logging_config.py       # 日志配置工具
-    └── logs/                       # 日志文件存储目录（自动生成）
+├── scripts/
+│   ├── logging_config.py                        # 日志配置工具
+│   └── tools/
+│       ├── web_search.py                        # 网页搜索功能（基于Playwright）
+│       ├── data_analyzer.py                     # 股票数据技术指标分析           （股票代码改为stock_id，部分指标改为保留8位小数，csv文件里数据结构统一，无文本类型）
+│       ├── news_crawler.py                      # 股票相关新闻爬取
+│       ├── financial_data.py                    # 股票价格历史数据获取与处理      （修改了Hurst指数的计算方式）
+│       ├── get_em_calendar_image.py             # 查找东方财富财经早餐网页图片链接
+│       ├── get_em_listpage_url.py               # 查找东方财富财经早餐网页链接
+│       ├── eastmoney_breakfast.py               # 查找东方财富财经早餐  （判读工作日函数有问题，从2022-11-9至2022-12-21无法正确返回网址序号）
+│       └── cache/                               # 数据缓存
+│           ├── news/                
+│           │   ├── eastmoney_breakfast/         # 东方财富财经早餐相关链接
+│           │   │   └── urls_of_em.json
+│           │   └── stock_news/                  #股票新闻，以股票代码划分文件夹
+│           └── stock_price_data/                #股票价格数据，以股票代码划分文件夹
+└── logs/                                       # 日志文件存储目录（自动生成）
 ```
+
+## 更新说明
+1.优化了代码结构   
+2.financial_data.py中修改了Hurst指数的计算方式，索引没变    
+3.提取到的新闻和价格数据，统一保存在cache文件夹中，以股票代码划分文件夹    
+4.data_analyzer.py中股票代码改为stock_id，部分指标改为保留8位小数，csv文件里数据结构统一，无文本类型        
+- 具体保留八位小数指标如下    
+```
+decimal_cols = [
+    "momentum_1m", "momentum_3m", "momentum_6m", "volume_ma20", "volume_momentum",
+    "historical_volatility", "volatility_regime", "volatility_z_score", "atr", "atr_ratio",
+    "hurst_exponent", "skewness", "kurtosis", "ma5", "ma10", "ma20", "ma60", "macd",
+    "singal_line", "macd_hist", "rsi", "bb_middle", "bb_upper", "bb_lower", "volume_ma5",
+    "volume_ratio", "price_momentum", "price_acceleration", "daily_return", "volatility_5d",
+    "volatility_20d"
+]
+```
+5.东方财富财经早餐相关功能基本完善，get_em_calendar_image.py和get_em_listpage_url.py在输入url后能正确读取相应链接，eastmoney_breakfast.py 列表网页计算仍存在问题
 
 ## 功能说明
 1.东方财富早报获取（eastmoney_breakfast.py）  
