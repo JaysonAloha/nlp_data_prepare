@@ -1,0 +1,111 @@
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+from financial_data import get_price_history
+import csv
+import os
+# from scripts.logging_config import setup_logger
+
+# logger=setup_logger("data_analyzer")
+
+def analyze_stock_data(symbol: str,start_date: str = None,end_ydate: str = None):
+    df=get_price_history(symbol,start_date,end_date)
+
+    if df.empty:
+        print("No data available")
+        return
+
+    #计算技术指标
+    #1. 移动平均线
+    df['ma5'] = df['close'].rolling(window=5).mean()
+    df['ma10'] = df['close'].rolling(window=10).mean()
+    df['ma20'] = df['close'].rolling(window=20).mean()
+    df['ma60'] = df['close'].rolling(window=60).mean()
+
+    #2. MACD-指数平滑异同平均线
+    """判断价格趋势的强弱、转折点，属于动量指标。"""
+    exp1=df["close"].ewm(span=12, adjust=False).mean()
+    exp2 = df["close"].ewm(span=26, adjust=False).mean()
+    df["macd"]=exp1-exp2
+    df["singal_line"]=df["macd"].ewm(span=9,adjust=False).mean()
+    df["macd_hist"]=df["macd"]-df["singal_line"]
+
+    #3. RSI相对强弱指数
+    """衡量价格涨跌的 强度，判断市场是否超买或超卖，范围在 0-100 之间。"""
+    delta=df["close"].diff()
+    gain = (delta.where(delta > 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0,0)).rolling(window=14).mean()
+    rs=gain/loss
+    df["rsi"]=100-(100/(1+rs))
+
+    # 4. 布林带
+    df['bb_middle'] = df['close'].rolling(window=20).mean()
+    bb_std = df['close'].rolling(window=20).std()
+    df['bb_upper'] = df['bb_middle'] + (bb_std * 2)
+    df['bb_lower'] = df['bb_middle'] - (bb_std * 2)
+
+    # 5. 成交量相关指标
+    df['volume_ma5'] = df['volume'].rolling(window=5).mean()
+    df['volume_ma20'] = df['volume'].rolling(window=20).mean()
+    df['volume_ratio'] = df['volume'] / df['volume_ma5']
+
+    # 6. 价格动量指标
+    df['price_momentum'] = df['close'].pct_change(periods=5)
+    df['price_acceleration'] = df['price_momentum'].diff()
+
+    # 7. 波动率指标
+    df['daily_return'] = df['close'].pct_change()
+    df['volatility_5d'] = df['daily_return'].rolling(window=5).std() * np.sqrt(252)
+    df['volatility_20d'] = df['daily_return'].rolling(window=20).std() * np.sqrt(252)
+
+    #禁用科学计数法
+    pd.set_option('display.float_format', lambda x: f"{x:.10f}".rstrip('0').rstrip('.') if x != 0 else '0')
+
+    #浮点数指标保留八位小数
+    decimal_cols = [
+        "momentum_1m", "momentum_3m", "momentum_6m", "volume_ma20", "volume_momentum",
+        "historical_volatility", "volatility_regime", "volatility_z_score", "atr", "atr_ratio",
+        "hurst_exponent", "skewness", "kurtosis", "ma5", "ma10", "ma20", "ma60", "macd",
+        "singal_line", "macd_hist", "rsi", "bb_middle", "bb_upper", "bb_lower", "volume_ma5",
+        "volume_ratio", "price_momentum", "price_acceleration", "daily_return", "volatility_5d",
+        "volatility_20d"
+    ]
+
+    # 所有列统一保留6位小数，NaN返回空字符串
+    for col in decimal_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        # 保留10位小数，避免自动转为科学计数法，并去除末尾多余的0和小数点
+        df[col] = df[col].apply(
+            lambda x: f"{x:.8f}".rstrip('0').rstrip('.') if not pd.isna(x) else ""
+        )
+
+    #保存
+    stock_data_dir=os.path.join("cache", "stock_price_data",symbol)
+    output_file = f"{symbol}_analysis_{datetime.now().strftime('%Y%m%d')}.csv"
+    stock_data_path=os.path.join(stock_data_dir,output_file)
+
+    # 确保目录存在
+    os.makedirs(stock_data_dir, exist_ok=True)
+
+    df.to_csv(stock_data_path,
+              index=False,
+              quoting=csv.QUOTE_NONE,
+              escapechar="\\")
+    print(f"Data saved to {output_file}")
+    print("\n基本统计信息:")
+    print(f"数据时间范围: {df['date'].min()} 至 {df['date'].max()}")
+    print(f"总记录数: {len(df)}")
+    print("\nNaN值统计:")
+    print(df.isna().sum())
+    #恢复全局设置（避免影响后续代码）
+    pd.reset_option('display.float_format')
+
+if __name__ == "__main__":
+    # 测试代码
+    symbol = "600519"  # 贵州茅台
+    current_date = datetime.now()
+    end_date = current_date.strftime("%Y-%m-%d")  # 使用今天作为结束日期
+    start_date = (current_date - timedelta(days=365)).strftime("%Y-%m-%d")
+
+    print(f"分析时间范围: {start_date} 至 {end_date}")
+    analyze_stock_data(symbol, start_date, end_date)
